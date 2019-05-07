@@ -28,8 +28,8 @@ class _ProfilePageViewState extends State<ProfilePageView>
           weight: 90, tween: Tween(begin: Offset(0, 1), end: Offset(0, 0))),
     ]).animate(_controller);
     _fadeAnimation = TweenSequence([
-      TweenSequenceItem<int>(weight: 10, tween: Tween(begin: 1, end: 0)),
-      TweenSequenceItem<int>(weight: 9, tween: Tween(begin: 0, end: 1)),
+      TweenSequenceItem<double>(weight: 10, tween: Tween(begin: 1, end: 0)),
+      TweenSequenceItem<double>(weight: 9, tween: Tween(begin: 0, end: 1)),
     ]).animate(_controller);
     super.initState();
   }
