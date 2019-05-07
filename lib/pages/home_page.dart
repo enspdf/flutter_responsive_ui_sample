@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_responsive_ui/common/app_bottom_bar.dart';
+import 'package:flutter_responsive_ui/pages/profile_page_view.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,9 +11,10 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation<double> _heightFactorAnimation;
-  final double collapsedHeightFactor = 0.85;
-  final double expandedHeightFactor = 0.67;
+  double collapsedHeightFactor = 0.90;
+  double expandedHeightFactor = 0.75;
   bool isAnimationCompleted = false;
+  double screenHeight = 0;
 
   @override
   void initState() {
@@ -33,9 +35,9 @@ class _HomePageState extends State<HomePage>
   onBottomPartTap() {
     setState(() {
       if (isAnimationCompleted) {
-        _controller.reverse();
+        _controller.fling(velocity: -1);
       } else {
-        _controller.forward();
+        _controller.fling(velocity: 1);
       }
 
       isAnimationCompleted = !isAnimationCompleted;
@@ -49,23 +51,18 @@ class _HomePageState extends State<HomePage>
         FractionallySizedBox(
           alignment: Alignment.topCenter,
           heightFactor: _heightFactorAnimation.value,
-          child: Image.asset(
-            'assets/images/profile.jpg',
-            fit: BoxFit.cover,
-            colorBlendMode: BlendMode.hue,
-            color: Colors.black,
-          ),
+          child: ProfilePageView(),
         ),
         GestureDetector(
-          onTap: () {
-            onBottomPartTap();
-          },
+          onTap: onBottomPartTap,
+          onVerticalDragUpdate: _handleVerticalUpdate,
+          onVerticalDragEnd: _handleVerticalEnd,
           child: FractionallySizedBox(
             alignment: Alignment.bottomCenter,
             heightFactor: 1.05 - _heightFactorAnimation.value,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.teal,
+                color: Color(0xFFEEEEEE),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(40.0),
                   topRight: Radius.circular(40.0),
@@ -78,9 +75,24 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  _handleVerticalUpdate(DragUpdateDetails updateDetails) {
+    double fractionDragged = updateDetails.primaryDelta / screenHeight;
+    _controller.value = _controller.value - 5 * fractionDragged;
+  }
+
+  _handleVerticalEnd(DragEndDetails endDetails) {
+    if (_controller.value >= 0.5) {
+      _controller.fling(velocity: 1);
+    } else {
+      _controller.fling(velocity: -1);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      backgroundColor: Color(0xFFEEEEEE),
       bottomNavigationBar: AppBottomBar(),
       body: AnimatedBuilder(
         animation: _controller,
